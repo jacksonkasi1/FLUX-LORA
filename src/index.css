@@ -1,0 +1,287 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ultra-Minimal Design System */
+@layer base {
+  :root {
+    /* Ultra-Clean Color System */
+    --background: 0 0% 100%; /* Pure white #FFFFFF */
+    --foreground: 0 0% 0%; /* Pure black #000000 */
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+
+    --primary: 0 0% 0%; /* Pure black for primary actions */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 96.3%; /* Light gray #F5F5F7 */
+    --secondary-foreground: 0 0% 0%;
+
+    --muted: 0 0% 96.3%; /* Light gray #F5F5F7 */
+    --muted-foreground: 0 0% 55.7%; /* Medium gray #8E8E93 */
+
+    --accent: 0 0% 0%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 96.3%; /* Light gray for subtle separations */
+    --input: 0 0% 96.3%;
+    --ring: 0 0% 0%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 0 0% 0%; /* Pure black #000000 */
+    --foreground: 0 0% 100%; /* Pure white #FFFFFF */
+    --card: 0 0% 0%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 0%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%; /* Pure white for primary actions in dark mode */
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 0%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 0%;
+    --muted-foreground: 0 0% 55.7%;
+    --accent: 0 0% 100%;
+    --accent-foreground: 0 0% 0%;
+    --border: 0 0% 0%;
+    --input: 0 0% 0%;
+    --ring: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    line-height: 1;
+  }
+
+  /* Ultra-Minimal Typography System */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    line-height: 1.5;
+  }
+
+  /* Remove all default margins and padding */
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Mathematical spacing rhythm */
+  .space-y-6 > * + * {
+    margin-top: 24px;
+  }
+
+  .space-y-8 > * + * {
+    margin-top: 32px;
+  }
+
+  .space-y-12 > * + * {
+    margin-top: 48px;
+  }
+}
+
+/* Mobile-First App Container */
+.app-container {
+  max-width: 425px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: white;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.main-content {
+  flex: 1;
+  padding-top: 80px; /* Header height */
+  padding-bottom: 80px; /* Bottom nav height */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ultra-Minimal Button System */
+.btn-minimal {
+  height: 50px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border: none;
+  transition: opacity 0.2s linear;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.btn-minimal:hover {
+  opacity: 0.8;
+}
+
+.btn-minimal:active {
+  opacity: 0.6;
+}
+
+.btn-minimal:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Input Field Styling */
+.input-minimal {
+  height: 50px;
+  font-size: 16px;
+  font-weight: 400;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0;
+  padding: 0;
+  color: white;
+  transition: border-color 0.2s linear;
+}
+
+.input-minimal:focus {
+  border-bottom-color: rgba(255, 255, 255, 0.6);
+  outline: none;
+  box-shadow: none;
+}
+
+.input-minimal::placeholder {
+  color: #8E8E93;
+}
+
+.input-minimal-light {
+  background: #F5F5F7;
+  border: none;
+  border-radius: 8px;
+  color: black;
+  padding: 0 16px;
+}
+
+.input-minimal-light:focus {
+  background: #EBEBEF;
+  outline: none;
+  box-shadow: none;
+}
+
+/* Loading Animation */
+@keyframes minimal-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.loading-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.loading-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  animation: minimal-pulse 1.2s infinite;
+}
+
+.loading-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Gallery Masonry Grid */
+.masonry-grid {
+  column-count: 2;
+  column-gap: 8px;
+  padding: 20px;
+}
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.masonry-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Backdrop Blur Effects */
+.backdrop-blur-minimal {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Safe Area Handling */
+@supports (padding: max(0px)) {
+  .safe-area-bottom {
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-top {
+    padding-top: max(20px, env(safe-area-inset-top));
+  }
+}
+
+/* Remove all visual noise */
+* {
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+/* Focus states for accessibility */
+.focus-minimal:focus-visible {
+  outline: 2px solid rgba(0, 0, 0, 0.1);
+  outline-offset: 2px;
+}
+
+/* Transition system */
+.transition-minimal {
+  transition: opacity 0.2s linear;
+}
+
+.transition-smooth {
+  transition: all 0.3s linear;
+}
+
+/* Hide scrollbars but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
