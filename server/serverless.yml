@@ -1,11 +1,11 @@
 service: flux-lora-backend
 
-frameworkVersion: '3'
+frameworkVersion: '4'
 
 provider:
   name: aws
   runtime: nodejs18.x
-  region: ${opt:region, 'us-east-1'}
+  region: ${opt:region, 'ap-south-1'}
   stage: ${opt:stage, 'dev'}
   memorySize: 512
   timeout: 30
@@ -14,7 +14,7 @@ provider:
     STAGE: ${self:provider.stage}
     REGION: ${self:provider.region}
     DYNAMODB_TABLE_PREFIX: ${self:service}-${self:provider.stage}
-    JWT_SECRET: ${env:JWT_SECRET}
+    JWT_SECRET: ${env:JWT_SECRET, 'default-jwt-secret-for-development'}
     CORS_ORIGIN: ${env:CORS_ORIGIN, '*'}
     
   iam:
@@ -53,26 +53,23 @@ provider:
             - "arn:aws:s3:::${self:service}-${self:provider.stage}-*"
 
 plugins:
-  - serverless-esbuild
+  - serverless-dotenv-plugin
   - serverless-offline
 
 custom:
-  esbuild:
-    bundle: true
-    minify: false
-    sourcemap: true
-    exclude: ['aws-sdk']
-    target: 'node18'
-    define:
-      'require.resolve': undefined
-    platform: 'node'
-    concurrency: 10
-    # Handle TypeScript path mapping
-    external: []
-    pathMapping:
-      '@server': './'
-      '@server/*': './*'
-    
+  dotenv:
+    path: .env
+    basePath: ./
+    include:
+      - JWT_SECRET
+      - CORS_ORIGIN
+      - FALAI_API_KEY
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_REGION
+      - DYNAMODB_TABLE_PREFIX
+      - STAGE
+
   serverless-offline:
     httpPort: 3001
     host: 0.0.0.0

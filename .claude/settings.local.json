@@ -15,7 +15,8 @@
       "Bash(pnpm run type-check)",
       "Bash(rg \"{ id:\" functions/)",
       "Bash(rg \"\\{ id:\" functions/)",
-      "Bash(pnpm run type-check:server)"
+      "Bash(pnpm run type-check:server)",
+      "Bash(rm /mnt/d/WORK/HACK/HACKTHON/FLUX-LORA/tsconfig.lambda.json /mnt/d/WORK/HACK/HACKTHON/FLUX-LORA/webpack.config.js /mnt/d/WORK/HACK/HACKTHON/FLUX-LORA/tsconfig.node.json)"
     ],
     "deny": []
   }
