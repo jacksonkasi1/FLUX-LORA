@@ -1,25 +1,22 @@
+/**
+ * Authentication context with improved organization
+ */
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { apiClient } from '@/lib/api';
 
-interface User {
-  id: string;
-  email: string;
-  displayName?: string;
-}
+// ** Import API services
+import { AuthAPI, apiClient } from '@/lib/api';
 
-interface AuthContextType {
-  user: User | null;
-  session: { user: User } | null;
-  loading: boolean;
-  signUp: (email: string, password: string, displayName?: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: () => Promise<void>;
-  signInWithGoogle: () => Promise<{ error: any }>;
-}
+// ** Import types
+import type { User, AuthContextType } from '@/types';
 
+// ** Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => {
+/**
+ * Custom hook to use auth context
+ */
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
@@ -27,47 +24,64 @@ export const useAuth = () => {
   return context;
 };
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+/**
+ * Authentication provider component
+ */
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // ** State management
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<{ user: User } | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // ** Initialize authentication state
   useEffect(() => {
-    // Check for existing token and validate it
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-      apiClient.setToken(token);
-      // Validate token by fetching profile
-      apiClient.getProfile()
-        .then((profile) => {
-          const userData = {
+    const initializeAuth = async () => {
+      const token = localStorage.getItem('auth_token');
+      
+      if (token) {
+        apiClient.setToken(token);
+        
+        try {
+          const profile = await AuthAPI.getProfile();
+          const userData: User = {
             id: profile.id,
             email: profile.email,
             displayName: profile.displayName,
+            avatarUrl: profile.avatarUrl,
+            createdAt: profile.createdAt,
+            updatedAt: profile.updatedAt,
           };
+          
           setUser(userData);
           setSession({ user: userData });
-          setLoading(false);
-        })
-        .catch(() => {
-          // Token is invalid, clear it
+        } catch (error) {
+          console.error('Token validation failed:', error);
+          // Clear invalid token
           apiClient.setToken(null);
           setUser(null);
           setSession(null);
-          setLoading(false);
-        });
-    } else {
+        }
+      }
+      
       setLoading(false);
-    }
+    };
+
+    initializeAuth();
   }, []);
 
+  /**
+   * Sign up new user
+   */
   const signUp = async (email: string, password: string, displayName?: string) => {
     try {
-      const response = await apiClient.register(email, password, displayName);
-      const userData = {
+      const response = await AuthAPI.register({ email, password, displayName });
+      const userData: User = {
         id: response.user.id,
         email: response.user.email,
         displayName: response.user.displayName,
+        avatarUrl: response.user.avatarUrl,
+        createdAt: response.user.createdAt,
+        updatedAt: response.user.updatedAt,
       };
       
       apiClient.setToken(response.token);
@@ -75,18 +89,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession({ user: userData });
       
       return { error: null };
-    } catch (error: any) {
-      return { error: { message: error.message } };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error instanceof Error ? error.message : "Unknown error" : 'Sign up failed';
+      return { error: new Error(errorMessage) };
     }
   };
 
+  /**
+   * Sign in existing user
+   */
   const signIn = async (email: string, password: string) => {
     try {
-      const response = await apiClient.login(email, password);
-      const userData = {
+      const response = await AuthAPI.login({ email, password });
+      const userData: User = {
         id: response.user.id,
         email: response.user.email,
         displayName: response.user.displayName,
+        avatarUrl: response.user.avatarUrl,
+        createdAt: response.user.createdAt,
+        updatedAt: response.user.updatedAt,
       };
       
       apiClient.setToken(response.token);
@@ -94,23 +115,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession({ user: userData });
       
       return { error: null };
-    } catch (error: any) {
-      return { error: { message: error.message } };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error instanceof Error ? error.message : "Unknown error" : 'Sign in failed';
+      return { error: new Error(errorMessage) };
     }
   };
 
-  const signOut = async () => {
+  /**
+   * Sign out user
+   */
+  const signOut = async (): Promise<void> => {
     apiClient.setToken(null);
     setUser(null);
     setSession(null);
   };
 
+  /**
+   * Sign in with Google (placeholder)
+   */
   const signInWithGoogle = async () => {
-    // Google OAuth not implemented in this simple setup
-    return { error: { message: 'Google OAuth not implemented yet' } };
+    return { error: new Error('Google OAuth not implemented yet') };
   };
 
-  const value = {
+  // ** Context value
+  const value: AuthContextType = {
     user,
     session,
     loading,

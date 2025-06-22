@@ -3,7 +3,7 @@ export interface UserSettings {
   displayName?: string;
   avatarUrl?: string;
   apiKeys: Record<string, string>; // Encrypted API keys
-  preferences: Record<string, any>;
+  preferences: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
 }
@@ -17,7 +17,7 @@ export interface TrainingModel {
   modelType: string;
   triggerWord?: string;
   imageCount?: number;
-  trainingConfig: Record<string, any>;
+  trainingConfig: Record<string, unknown>;
   modelUrl?: string;
   thumbnailUrl?: string;
   createdAt: string;
@@ -43,7 +43,7 @@ export interface GeneratedImage {
   prompt: string;
   negativePrompt?: string;
   imageUrl: string;
-  generationConfig: Record<string, any>;
+  generationConfig: Record<string, unknown>;
   isFavorite: boolean;
   createdAt: string;
   updatedAt: string;

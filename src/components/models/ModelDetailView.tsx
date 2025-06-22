@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ImageIcon, Calendar, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { TrainingImageModal } from "./TrainingImageModal";
 import { cn } from "@/lib/utils";
+
+// ** import api
+import { apiClient } from '@/lib/api';
 
 interface ModelDetailViewProps {
   modelId: string;
@@ -37,14 +39,7 @@ export const ModelDetailView = ({ modelId, onBack }: ModelDetailViewProps) => {
   const { data: model, isLoading: modelLoading } = useQuery({
     queryKey: ['training-model', modelId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('training_models')
-        .select('*')
-        .eq('id', modelId)
-        .single();
-
-      if (error) throw error;
-      return data as ModelDetail;
+      const data = await apiClient.get('/training-models');      return data as ModelDetail;
     },
     enabled: !!modelId,
   });
@@ -52,14 +47,7 @@ export const ModelDetailView = ({ modelId, onBack }: ModelDetailViewProps) => {
   const { data: trainingImages, isLoading: imagesLoading } = useQuery({
     queryKey: ['model-training-images', modelId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('training_images')
-        .select('*')
-        .eq('training_model_id', modelId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as TrainingImage[];
+      const data = await apiClient.get('/training-images');      return data as TrainingImage[];
     },
     enabled: !!modelId,
   });

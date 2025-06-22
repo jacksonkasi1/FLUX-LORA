@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /mnt/d/WORK/HACK/HACKTHON/FLUX-LORA/server/functions -type f -name \"*.ts\")",
+      "Bash(find /mnt/d/WORK/HACK/HACKTHON/FLUX-LORA/server/functions -type d)",
+      "Bash(cd /mnt/d/WORK/HACK/HACKTHON/FLUX-LORA/server)",
+      "Bash(npm run type-check)",
+      "Bash(mv /mnt/d/WORK/HACK/HACKTHON/FLUX-LORA/serverless.yml /mnt/d/WORK/HACK/HACKTHON/FLUX-LORA/server/)",
+      "Bash(touch /mnt/d/WORK/HACK/HACKTHON/FLUX-LORA/.env.example)",
+      "Bash(npm install)",
+      "Bash(pnpm install)",
+      "Bash(rm -rf node_modules pnpm-lock.yaml)",
+      "Bash(pnpm install --no-frozen-lockfile)",
+      "Bash(cd /mnt/d/WORK/HACK/HACKTHON/FLUX-LORA)",
+      "Bash(pnpm run type-check)",
+      "Bash(rg \"{ id:\" functions/)",
+      "Bash(rg \"\\{ id:\" functions/)",
+      "Bash(pnpm run type-check:server)"
+    ],
+    "deny": []
+  }
+}

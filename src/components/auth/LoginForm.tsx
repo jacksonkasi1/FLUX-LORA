@@ -27,7 +27,7 @@ export const LoginForm = () => {
     if (error) {
       toast({
         title: "Authentication failed",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Unknown error",
         variant: "destructive",
       });
     } else {
@@ -41,7 +41,7 @@ export const LoginForm = () => {
     if (error) {
       toast({
         title: "Authentication failed",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Unknown error",
         variant: "destructive",
       });
     }

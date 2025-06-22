@@ -3,10 +3,9 @@ import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Camera } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 
 interface ProfileAvatarProps {
-  user: any;
+  user: unknown;
   displayName: string;
   avatarUrl: string;
   onAvatarUpdate: (url: string) => void;
@@ -64,10 +63,10 @@ export const ProfileAvatar = ({ user, displayName, avatarUrl, onAvatarUpdate }: 
         title: "Avatar updated",
         description: "Your profile picture has been updated successfully.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error uploading avatar",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Unknown error",
         variant: "destructive",
       });
     } finally {

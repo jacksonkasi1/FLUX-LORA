@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/lambda',
+  entry: './server/functions',
   target: 'node',
   mode: 'production',
   optimization: {
@@ -27,6 +27,7 @@ module.exports = {
             loader: 'ts-loader',
             options: {
               transpileOnly: true,
+              configFile: 'tsconfig.lambda.json',
             },
           },
         ],
@@ -37,7 +38,15 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
     alias: {
+      '@server': path.resolve(__dirname, 'server'),
+      '@server/config': path.resolve(__dirname, 'server/config'),
+      '@server/lib': path.resolve(__dirname, 'server/lib'),
+      '@server/types': path.resolve(__dirname, 'server/types'),
+      '@server/utils': path.resolve(__dirname, 'server/utils'),
+      '@server/services': path.resolve(__dirname, 'server/services'),
+      // Keep client aliases for shared types
       '@': path.resolve(__dirname, 'src'),
+      '@/types': path.resolve(__dirname, 'src/types'),
     },
   },
   output: {

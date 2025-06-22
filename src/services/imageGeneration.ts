@@ -1,7 +1,15 @@
+/**
+ * Image generation service
+ * Handles AI image generation using FAL.AI
+ */
 
 import { fal } from '@fal-ai/client';
-import { supabase } from '@/integrations/supabase/client';
-import { getUserApiKey } from './falai';
+
+// ** import config
+import { env } from '@/config';
+
+// ** import types
+import type { GeneratedImage } from '@/types';
 
 export interface GenerateImageParams {
   prompt: string;
@@ -20,29 +28,26 @@ export interface GeneratedImageResult {
   seed: number;
   prompt: string;
   negativePrompt?: string;
-  generationConfig: any;
+  generationConfig: Record<string, unknown>;
 }
 
+/**
+ * Generate image with trained LoRA model
+ */
 export const generateImageWithModel = async (
   params: GenerateImageParams, 
   userId: string, 
   modelId: string
 ): Promise<GeneratedImageResult> => {
   try {
-    // Get user's API key
-    const apiKey = await getUserApiKey(userId);
-    if (!apiKey) {
-      throw new Error('FAL.AI API key not found. Please add your API key in Settings.');
-    }
-
-    // Configure FAL client
+    // Configure FAL client with API key
     fal.config({
-      credentials: apiKey,
+      credentials: env.external.falaiApiKey,
     });
 
     console.log('Generating image with trained model:', params);
 
-    // Generate image using the trained LoRA model with correct property names
+    // Generate image using the trained LoRA model
     const result = await fal.subscribe('fal-ai/flux-lora', {
       input: {
         prompt: params.prompt,
@@ -73,24 +78,8 @@ export const generateImageWithModel = async (
       seed: result.data.seed || params.seed,
     };
 
-    // Save generated image to database
-    const { data: savedImage, error } = await supabase
-      .from('generated_images')
-      .insert({
-        user_id: userId,
-        training_model_id: modelId,
-        prompt: params.prompt,
-        negative_prompt: params.negativePrompt,
-        image_url: imageUrl,
-        generation_config: generationConfig,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error saving generated image:', error);
-      // Don't throw here - we still want to return the generated image
-    }
+    // Note: Image saving to database should be handled by the API layer
+    // This service only handles the generation logic
 
     return {
       imageUrl,
@@ -100,8 +89,9 @@ export const generateImageWithModel = async (
       generationConfig,
     };
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Image generation failed:', error);
-    throw new Error(error.message || 'Failed to generate image');
+    const errorMessage = error instanceof Error ? error instanceof Error ? error.message : "Unknown error" : 'Failed to generate image';
+    throw new Error(errorMessage);
   }
 };

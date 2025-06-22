@@ -9,7 +9,9 @@ import { PasswordChangeForm } from '@/components/profile/PasswordChangeForm';
 import { ApiKeyConfig } from '@/components/settings/ApiKeyConfig';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+
+// ** import api
+import { apiClient } from '@/lib/api';
 
 export const SettingsPage = () => {
   const { user } = useAuth();
@@ -27,11 +29,7 @@ export const SettingsPage = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('user_settings')
-        .select('display_name, avatar_url')
-        .eq('user_id', user.id)
-        .single();
+      const data = await apiClient.get('/user-settings');
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading profile:', error);

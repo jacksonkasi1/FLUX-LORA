@@ -4,10 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 
 interface ProfileFormProps {
-  user: any;
+  user: unknown;
   displayName: string;
   avatarUrl: string;
   onDisplayNameChange: (name: string) => void;
@@ -38,7 +37,7 @@ export const ProfileForm = ({ user, displayName, avatarUrl, onDisplayNameChange 
       if (error) {
         toast({
           title: "Error updating profile",
-          description: error.message,
+          description: error instanceof Error ? error.message : "Unknown error",
           variant: "destructive",
         });
       } else {

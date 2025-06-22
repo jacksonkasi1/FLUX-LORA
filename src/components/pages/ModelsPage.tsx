@@ -3,10 +3,12 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Bot } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ModelCard } from "@/components/models/ModelCard";
 import { ModelDetailView } from "@/components/models/ModelDetailView";
+
+// ** import api
+import { apiClient } from '@/lib/api';
 
 interface TrainingModel {
   id: string;
@@ -30,27 +32,14 @@ export const ModelsPage = () => {
     queryFn: async () => {
       if (!user) return [];
       
-      const { data, error } = await supabase
-        .from('training_models')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as TrainingModel[];
+      const data = await apiClient.get('/training-models');      return data as TrainingModel[];
     },
     enabled: !!user,
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (modelId: string) => {
-      const { error } = await supabase
-        .from('training_models')
-        .delete()
-        .eq('id', modelId);
-      
-      if (error) throw error;
-    },
+      await apiClient.delete('/training-models/{modelId}');    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['training-models'] });
       toast({
@@ -61,7 +50,7 @@ export const ModelsPage = () => {
     onError: (error: any) => {
       toast({
         title: "Error deleting model",
-        description: error.message || "Failed to delete the model.",
+        description: error instanceof Error ? error.message : "Unknown error" || "Failed to delete the model.",
         variant: "destructive",
       });
     },

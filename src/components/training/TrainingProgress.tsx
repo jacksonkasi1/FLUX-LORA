@@ -4,7 +4,6 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, XCircle, Clock, Zap } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 
 interface TrainingProgressProps {
   modelId: string;
@@ -70,18 +69,7 @@ export const TrainingProgress = ({ modelId, onComplete, onError }: TrainingProgr
 
   const fetchModelStatus = async () => {
     try {
-      const { data, error } = await supabase
-        .from('training_models')
-        .select('status')
-        .eq('id', modelId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching model status:', error);
-        return;
-      }
-
-      setStatus(data.status as TrainingStatus);
+      const data = await apiClient.get('/training-models');setStatus(data.status as TrainingStatus);
       if (data.status === 'training') {
         setProgress(25);
         setEstimatedTime(300);

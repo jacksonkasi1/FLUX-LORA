@@ -1,5 +1,10 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { useAuth } from '@/contexts/AuthContext';
+// ** import third party
+import { User, Settings, LogOut } from 'lucide-react';
+
+// ** import shared components
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -9,10 +14,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, Settings, LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+
+// ** import contexts
+import { useAuth } from '@/contexts/AuthContext';
+
+// ** import api
+import { apiClient } from '@/lib/api';
 
 export const UserMenu = () => {
   const { user, signOut } = useAuth();
@@ -30,15 +37,11 @@ export const UserMenu = () => {
     if (!user) return;
 
     try {
-      const { data } = await supabase
-        .from('user_settings')
-        .select('display_name, avatar_url')
-        .eq('user_id', user.id)
-        .single();
-
-      if (data) {
-        setDisplayName(data.display_name || '');
-        setAvatarUrl(data.avatar_url || '');
+      const settings = await apiClient.get('/settings');
+      
+      if (settings) {
+        setDisplayName(settings.displayName || '');
+        setAvatarUrl(settings.avatarUrl || '');
       }
     } catch (error) {
       console.error('Error loading user profile:', error);

@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ImageIcon } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
@@ -36,10 +35,7 @@ export const TrainingImagesView = () => {
           training_model:training_models(name, trigger_word)
         `)
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return data as TrainingImage[];
+        .order('created_at', { ascending: false });      return data as TrainingImage[];
     },
     enabled: !!user,
   });

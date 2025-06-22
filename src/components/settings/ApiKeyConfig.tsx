@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Key, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 
 export const ApiKeyConfig = () => {
   const { user } = useAuth();
@@ -24,11 +23,7 @@ export const ApiKeyConfig = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('user_settings')
-        .select('fal_api_key')
-        .eq('user_id', user.id)
-        .single();
+      const data = await apiClient.get('/user-settings');
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading API key:', error);
@@ -73,7 +68,7 @@ export const ApiKeyConfig = () => {
       if (error) {
         toast({
           title: "Error saving API key",
-          description: error.message,
+          description: error instanceof Error ? error.message : "Unknown error",
           variant: "destructive",
         });
       } else {
@@ -110,7 +105,7 @@ export const ApiKeyConfig = () => {
       if (error) {
         toast({
           title: "Error removing API key",
-          description: error.message,
+          description: error instanceof Error ? error.message : "Unknown error",
           variant: "destructive",
         });
       } else {

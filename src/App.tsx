@@ -1,19 +1,30 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import Index from "./pages/Index";
-import { AuthPage } from "./pages/AuthPage";
-import { SignupPage } from "./pages/SignupPage";
-import { ProfilePage } from "./components/pages/ProfilePage";
-import { SettingsPage } from "./components/pages/SettingsPage";
-import { TrainPage } from "./components/pages/TrainPage";
-import NotFound from "./pages/NotFound";
+// ** import third party
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+// ** import shared components
+import { Toaster } from '@/components/ui/toaster';
+import { Toaster as Sonner } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
+
+// ** import components
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+
+// ** import pages
+import Index from './pages/Index';
+import { AuthPage } from './pages/AuthPage';
+import { SignupPage } from './pages/SignupPage';
+import { ProfilePage } from './components/pages/ProfilePage';
+import { SettingsPage } from './components/pages/SettingsPage';
+import { TrainPage } from './components/pages/TrainPage';
+import NotFound from './pages/NotFound';
+
+// ** import contexts
+import { AuthProvider } from '@/contexts/AuthContext';
+
+// Constants
 const queryClient = new QueryClient();
 
 const App = () => (

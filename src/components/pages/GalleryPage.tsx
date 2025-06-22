@@ -6,7 +6,6 @@ import { EmptyState } from "@/components/gallery/EmptyState";
 import { ImageModal } from "@/components/gallery/ImageModal";
 import { useGeneratedImages } from "@/hooks/useGeneratedImages";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -22,17 +21,14 @@ export const GalleryPage = () => {
       const { error } = await supabase
         .from('generated_images')
         .update({ is_favorite: isFavorite })
-        .eq('id', imageId);
-      
-      if (error) throw error;
-    },
+        .eq('id', imageId);    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['generated-images'] });
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to update favorite status.",
+        description: error instanceof Error ? error.message : "Unknown error" || "Failed to update favorite status.",
         variant: "destructive",
       });
     },
@@ -40,13 +36,7 @@ export const GalleryPage = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (imageId: string) => {
-      const { error } = await supabase
-        .from('generated_images')
-        .delete()
-        .eq('id', imageId);
-      
-      if (error) throw error;
-    },
+      await apiClient.delete('/generated-images/{imageId}');    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['generated-images'] });
       toast({
@@ -57,7 +47,7 @@ export const GalleryPage = () => {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to delete image.",
+        description: error instanceof Error ? error.message : "Unknown error" || "Failed to delete image.",
         variant: "destructive",
       });
     },

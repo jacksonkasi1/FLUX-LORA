@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 
 interface ImageCardProps {
-  image: any; // TODO: Define proper type
+  image: unknown; // TODO: Define proper type
 }
 
 export const ImageCard = ({ image }: ImageCardProps) => {

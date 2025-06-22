@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { Eye, EyeOff } from 'lucide-react';
 
 export const PasswordChangeForm = () => {
@@ -44,7 +43,7 @@ export const PasswordChangeForm = () => {
       if (error) {
         toast({
           title: "Error updating password",
-          description: error.message,
+          description: error instanceof Error ? error.message : "Unknown error",
           variant: "destructive",
         });
       } else {

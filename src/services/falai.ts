@@ -1,20 +1,38 @@
+/**
+ * FAL.AI service
+ * Handles interactions with FAL.AI API for model training and generation
+ */
+
 import { fal } from '@fal-ai/client';
+
+// ** import config
+import { env } from '@/config';
+
+// ** import api client
 import { apiClient } from '@/lib/api';
 
+// ** import types
+import type { UserSettings } from '@/types';
+
+/**
+ * Get user's FAL.AI API key from settings
+ */
 export const getUserApiKey = async (userId: string): Promise<string | null> => {
   try {
-    const settings = await apiClient.getSettings();
+    // First try to get from user settings via API
+    const settings = await apiClient.get<UserSettings>('/settings');
     
-    if (!settings.hasApiKeys || !settings.apiKeyServices.includes('falai')) {
-      return null;
+    if (settings?.hasApiKeys && settings?.apiKeyServices?.includes('falai')) {
+      // Get the FAL.AI API key from the apiKeys record
+      return settings.apiKeys['falai'] || env.external.falaiApiKey || null;
     }
 
-    // In a real implementation, you'd decrypt the API key here
-    // For now, we'll assume it's stored in environment or user needs to provide it
-    return process.env.VITE_FALAI_API_KEY || null;
+    // Fallback to environment variable
+    return env.external.falaiApiKey || null;
   } catch (error) {
     console.error('Error fetching API key:', error);
-    return null;
+    // Fallback to environment variable
+    return env.external.falaiApiKey || null;
   }
 };
 
@@ -25,6 +43,9 @@ interface TrainFluxModelParams {
   apiKey: string;
 }
 
+/**
+ * Compress image for training
+ */
 const compressImage = (file: File, maxWidth: number = 1024, quality: number = 0.7): Promise<File> => {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
@@ -66,7 +87,7 @@ export const trainFluxModel = async ({ images, triggerWord, modelId, apiKey }: T
     });
 
     // Update model status to training
-    await apiClient.updateTrainingModel(modelId, { status: 'training' });
+    await apiClient.put(`/models/${modelId}`, { status: 'training' });
 
     console.log('Starting image compression and ZIP creation...');
     
@@ -124,7 +145,7 @@ export const trainFluxModel = async ({ images, triggerWord, modelId, apiKey }: T
     console.log('Training result:', result);
 
     // Update model with training results
-    await apiClient.updateTrainingModel(modelId, { 
+    await apiClient.put(`/models/${modelId}`, { 
       status: 'completed',
       modelUrl: result.data?.diffusers_lora_file?.url || null,
       trainingConfig: result.data
@@ -132,11 +153,11 @@ export const trainFluxModel = async ({ images, triggerWord, modelId, apiKey }: T
 
     return result;
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Training failed:', error);
     
     // Update model status to failed
-    await apiClient.updateTrainingModel(modelId, { status: 'failed' });
+    await apiClient.put(`/models/${modelId}`, { status: 'failed' });
 
     throw error;
   }

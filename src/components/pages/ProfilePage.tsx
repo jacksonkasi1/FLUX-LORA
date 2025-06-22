@@ -4,12 +4,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { PasswordChangeForm } from '@/components/profile/PasswordChangeForm';
+
+// ** import api
+import { apiClient } from '@/lib/api';
 
 export const ProfilePage = () => {
   const { user } = useAuth();
@@ -28,11 +30,7 @@ export const ProfilePage = () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('user_settings')
-        .select('display_name, avatar_url')
-        .eq('user_id', user.id)
-        .single();
+      const data = await apiClient.get('/user-settings');
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading profile:', error);

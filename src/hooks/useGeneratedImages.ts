@@ -1,22 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/contexts/AuthContext";
-import { apiClient } from "@/lib/api";
+/**
+ * Hook for managing generated images
+ */
 
-export interface GeneratedImage {
-  id: string;
-  prompt: string;
-  negativePrompt?: string;
-  imageUrl: string;
-  isFavorite: boolean;
-  generationConfig: any;
-  createdAt: string;
-  training_model?: {
-    id: string;
-    name: string;
-    trigger_word: string;
-  };
-}
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+// ** Import contexts
+import { useAuth } from '@/contexts/AuthContext';
+
+// ** Import API client
+import { apiClient } from '@/lib/api';
+
+// ** Import types
+import type { GeneratedImage } from '@/types';
+
+/**
+ * Hook to fetch generated images
+ */
 export const useGeneratedImages = () => {
   const { user } = useAuth();
 
@@ -24,10 +23,42 @@ export const useGeneratedImages = () => {
     queryKey: ['generated-images', user?.id],
     queryFn: async () => {
       if (!user) return [];
-      
-      const data = await apiClient.getGeneratedImages();
-      return data as GeneratedImage[];
+      return await apiClient.get<GeneratedImage[]>('/generated-images');
     },
     enabled: !!user,
+  });
+};
+
+/**
+ * Hook to create a generated image record
+ */
+export const useCreateGeneratedImage = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async (imageData: Partial<GeneratedImage>) => {
+      return await apiClient.post<GeneratedImage>('/generated-images', imageData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['generated-images', user?.id] });
+    },
+  });
+};
+
+/**
+ * Hook to delete a generated image
+ */
+export const useDeleteGeneratedImage = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async (imageId: string) => {
+      await apiClient.delete(`/generated-images/${imageId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['generated-images', user?.id] });
+    },
   });
 };

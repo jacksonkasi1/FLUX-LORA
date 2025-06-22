@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { apiClient } from '@/lib/api';
-import { trainFluxModel, getUserApiKey } from '@/services/falai';
+import { trainFluxModel } from '@/services/falai';
 import { ModelConfig } from '@/components/training/ModelConfig';
+import { SettingsAPI } from '@/lib/api/settings';
+import { ModelsAPI } from '@/lib/api/models';
+import { TrainingImagesAPI, UploadAPI } from '@/lib/api/images';
 
 export const useTrainingFlow = () => {
   const { user } = useAuth();
@@ -53,7 +55,7 @@ export const useTrainingFlow = () => {
       setIsTraining(true);
 
       // Check if user has FAL.AI API key
-      const settings = await apiClient.getSettings();
+      const settings = await SettingsAPI.getSettings();
       if (!settings.hasApiKeys || !settings.apiKeyServices.includes('falai')) {
         toast({
           title: "API Key Required",
@@ -65,7 +67,7 @@ export const useTrainingFlow = () => {
       }
 
       // Create the model record
-      const model = await apiClient.createTrainingModel({
+      const model = await ModelsAPI.createModel({
         name: modelConfig.name,
         triggerWord: modelConfig.triggerWord,
         description: modelConfig.description,
@@ -78,7 +80,7 @@ export const useTrainingFlow = () => {
       // Upload images and save references
       const uploadPromises = images.map(async (image, index) => {
         // Get presigned upload URL
-        const { uploadUrl, publicUrl } = await apiClient.getPresignedUploadUrl(
+        const { uploadUrl, publicUrl } = await UploadAPI.getPresignedUploadUrl(
           `${model.id}-${index}-${Date.now()}.${image.type.split('/')[1]}`,
           image.type,
           'training'
@@ -94,7 +96,7 @@ export const useTrainingFlow = () => {
         });
 
         // Save image record to database
-        await apiClient.uploadTrainingImage(model.id, {
+        await TrainingImagesAPI.uploadImage(model.id, {
           imageUrl: publicUrl,
           originalFilename: image.name,
           fileSize: image.size,
@@ -123,16 +125,16 @@ export const useTrainingFlow = () => {
         console.error('Background training error:', error);
         toast({
           title: "Training failed",
-          description: error.message || "Training failed. Please try again.",
+          description: error instanceof Error ? error.message : "Training failed. Please try again.",
           variant: "destructive",
         });
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Training setup error:', error);
       toast({
         title: "Training failed",
-        description: error.message || "Failed to start training. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to start training. Please try again.",
         variant: "destructive",
       });
       setIsTraining(false);
